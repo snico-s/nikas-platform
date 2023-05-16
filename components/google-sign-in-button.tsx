@@ -17,7 +17,7 @@ const GoogleSignInButton = () => {
   if (status === "loading")
     return (
       <div>
-        <Skeleton className="h-[40px] w-[200px] rounded-md bg-primary" />
+        <Skeleton className="h-[40px] w-[200px] rounded-md" />
       </div>
     )
 
