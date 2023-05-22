@@ -53,6 +53,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  Track         Track[]
 }
 
 model VerificationToken {
@@ -61,4 +62,18 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Track {
+  id         String                   @id @default(cuid())
+  type       String
+  track      Unsupported("geography")
+  // simplifiedCoordinates Json
+  properties Json
+  createdAt  DateTime                 @default(now())
+  createdBy  String?
+
+  User User? @relation(fields: [createdBy], references: [id])
+
+  @@index([track], map: "restaurants_geo_index_track", type: Gist)
 }

@@ -13,4 +13,14 @@ export const siteConfig = {
       href: "/user",
     },
   ],
+  userNav: [
+    {
+      title: "Profile",
+      href: "/user",
+    },
+    {
+      title: "Tracks",
+      href: "/user/tracks",
+    },
+  ],
 }
