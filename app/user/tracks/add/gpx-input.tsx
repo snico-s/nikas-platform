@@ -34,6 +34,8 @@ export default function GPXInput({
 
     setShowProgress(true)
     setProgress(0)
+    setTravelDayDataList([])
+    setFileReadCompleted(false)
     let handledFiles = 0
 
     Array.from(files).forEach((file) => {

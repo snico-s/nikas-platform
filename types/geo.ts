@@ -1,3 +1,5 @@
+import { Feature } from "maplibre-gl"
+
 import { LineStringProperties } from "@/lib/geoHelpers"
 
 export type FileData = {
