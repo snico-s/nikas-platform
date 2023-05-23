@@ -1,9 +1,11 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 import { TravelDayData } from "@/types/geo"
+import { LineStringProperties } from "@/lib/geoHelpers"
+import { formatDateWithoutSpaces } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import Map from "@/components/map"
 
@@ -19,7 +21,6 @@ export default function AddTrackPage() {
 
   const router = useRouter()
   const pathname = usePathname()
-
   const searchParams = useSearchParams()
   const step = searchParams.get("step") || ""
 
@@ -35,9 +36,24 @@ export default function AddTrackPage() {
 
   return (
     <div>
-      {showMap && step === "show-map" ? (
+      {true && step === "show-map" ? (
         <div>
-          <Map travelDayDataList={travelDayDataList} />
+          <Map
+            className="h-96"
+            lineStrings={travelDayDataList.map((item) => {
+              const lineString: GeoJSON.Feature<
+                GeoJSON.LineString,
+                LineStringProperties
+              > = {
+                geometry: item.lineString.geometry,
+                properties: item.lineString.properties,
+                type: "Feature",
+                id: item.date.toString(),
+                bbox: item.lineString?.bbox,
+              }
+              return lineString
+            })}
+          />
         </div>
       ) : (
         <div className="container m-auto pb-8 pt-6 sm:w-3/5">
@@ -57,10 +73,12 @@ export default function AddTrackPage() {
                 className="mt-4 w-full"
                 onClick={() => {
                   setShowMap(true)
+                  setFileReadCompleted(false)
                   router.push(
                     pathname + "?" + createQueryString("step", "show-map")
                   )
                 }}
+                autoFocus={fileReadCompleted}
               >
                 Show Me On The Map
               </Button>
