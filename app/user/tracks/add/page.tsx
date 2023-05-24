@@ -71,6 +71,10 @@ export default function AddTrackPage() {
     return !removedLayerIds.includes(id)
   }
 
+  const handleSort = (a: TravelDayData, b: TravelDayData) => {
+    return a.date.getTime() - b.date.getTime()
+  }
+
   return (
     <div>
       {step === "show-map" ? (
@@ -96,13 +100,14 @@ export default function AddTrackPage() {
             <ScrollArea className="h-full w-full">
               {travelDayDataList
                 .filter(filterDeleted)
+                .sort(handleSort)
                 .map((travelDayData, index) => (
-                  <div className="m-2" key={index}>
-                    <TravelDayCards
+                  <ol className="m-2" key={index}>
+                    <TravelDayListItem
                       travelDayData={travelDayData}
                       handleDelete={handleDelete}
                     />
-                  </div>
+                  </ol>
                 ))}
             </ScrollArea>
           </div>
@@ -141,32 +146,47 @@ export default function AddTrackPage() {
   )
 }
 
-type TravelDayDataProps = {
+type TravelDayListItemProps = {
   travelDayData: TravelDayData
   handleDelete: (travelDayData: TravelDayData) => void
 }
 
-function TravelDayCards({ travelDayData, handleDelete }: TravelDayDataProps) {
+function TravelDayListItem({
+  travelDayData,
+  handleDelete,
+}: TravelDayListItemProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex place-content-between">
-          <div>{travelDayData.date.toDateString()}</div>
-          <div>
-            <Button
-              variant={"ghost"}
-              onClick={() => handleDelete(travelDayData)}
-            >
-              <Icons.trash2 width={20} height={20} />
-              <span className="sr-only">Delete</span>
-            </Button>
-          </div>
-        </CardTitle>
-        <CardDescription>
-          Distanz:{" "}
-          {length(travelDayData.lineString, { units: "kilometers" }).toFixed(2)}
-        </CardDescription>
-      </CardHeader>
-    </Card>
+    <li className="flex place-content-between items-center rounded-md p-2 hover:bg-accent hover:text-accent-foreground">
+      <div className="">
+        <div className="text-sm font-medium">
+          {travelDayData.date.toDateString()}
+        </div>
+        <div className="text-sm text-muted-foreground">
+          Distance:{" "}
+          {length(travelDayData.lineString, {
+            units: "kilometers",
+          }).toFixed(2)}
+        </div>
+      </div>
+
+      <div>
+        <Button
+          className="px-2"
+          variant={"ghost"}
+          onClick={() => console.log("edit")}
+        >
+          <Icons.pencil width={16} height={16} />
+          <span className="sr-only">Edit</span>
+        </Button>
+        <Button
+          className="px-2"
+          variant={"ghost"}
+          onClick={() => handleDelete(travelDayData)}
+        >
+          <Icons.trash2 width={16} height={16} />
+          <span className="sr-only">Delete</span>
+        </Button>
+      </div>
+    </li>
   )
 }
