@@ -10,7 +10,7 @@ type Props = {
   removedLayerIds?: string[]
 } & React.HTMLAttributes<HTMLDivElement>
 
-const API_KEY = "9V8S1PVf6CfINuabJsSA"
+const API_KEY = process.env.NEXT_PUBLIC_MAPTILER_API_KEY
 
 export default function Map({
   lineStrings,
