@@ -4,6 +4,7 @@ import {
   Menu,
   Moon,
   SunMedium,
+  Trash2,
   Twitter,
   X,
   type Icon as LucideIcon,
@@ -18,6 +19,7 @@ export const Icons = {
   menu: Menu,
   twitter: Twitter,
   logout: LogOut,
+  trash2: Trash2,
 
   google: (props: LucideProps) => (
     <svg

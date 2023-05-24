@@ -5,13 +5,19 @@ import "node_modules/maplibre-gl/dist/maplibre-gl.css"
 import { LineStringProperties } from "@/lib/geoHelpers"
 import { cn, generateRandomString } from "@/lib/utils"
 
-type newProps = {
+type Props = {
   lineStrings?: GeoJSON.Feature<GeoJSON.LineString, LineStringProperties>[]
+  removedLayerIds?: string[]
 } & React.HTMLAttributes<HTMLDivElement>
 
 const API_KEY = "9V8S1PVf6CfINuabJsSA"
 
-export default function Map({ lineStrings, className, ...props }: newProps) {
+export default function Map({
+  lineStrings,
+  removedLayerIds,
+  className,
+  ...props
+}: Props) {
   const mapContainer = useRef<HTMLDivElement | null>(null)
   const map = useRef<maplibregl.Map | null>(null)
 
@@ -32,7 +38,6 @@ export default function Map({ lineStrings, className, ...props }: newProps) {
       const bounds = new LngLatBounds()
 
       for (const lineString of lineStrings) {
-        if (!map.current) return
         addGeoJsonToMap(lineString, map.current)
 
         lineString.geometry.coordinates.forEach((coordinate) => {
@@ -47,6 +52,8 @@ export default function Map({ lineStrings, className, ...props }: newProps) {
   function addGeoJsonToMap(geoJson: GeoJSON.Feature, map: maplibregl.Map) {
     const id = geoJson.id?.toString() || generateRandomString()
 
+    console.log("Hier")
+    console.log(map.getLayer(id))
     if (map.getLayer(id)) return
 
     map.addSource(id, {
@@ -68,6 +75,20 @@ export default function Map({ lineStrings, className, ...props }: newProps) {
       },
     })
   }
+
+  useEffect(() => {
+    if (!map.current || !map.current.loaded() || !removedLayerIds) return
+    if (!lineStrings) return
+
+    for (const lineString of lineStrings) {
+      addGeoJsonToMap(lineString, map.current)
+    }
+
+    for (const id of removedLayerIds) {
+      if (map.current.getLayer(id)) map.current.removeLayer(id)
+      if (map.current.getSource(id)) map.current.removeSource(id)
+    }
+  }, [removedLayerIds, lineStrings])
 
   return (
     <div className={cn("relative h-96 w-full", className)} {...props}>

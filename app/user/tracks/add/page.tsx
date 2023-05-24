@@ -1,12 +1,22 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useState } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import length from "@turf/length"
 
 import { TravelDayData } from "@/types/geo"
 import { LineStringProperties } from "@/lib/geoHelpers"
-import { formatDateWithoutSpaces } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { ToastAction } from "@/components/ui/toast"
+import { useToast } from "@/components/ui/use-toast"
+import { Icons } from "@/components/icons"
 import Map from "@/components/map"
 
 import GPXInput from "./gpx-input"
@@ -16,8 +26,8 @@ export default function AddTrackPage() {
   const [travelDayDataList, setTravelDayDataList] = useState<TravelDayData[]>(
     []
   )
-  const [showMap, setShowMap] = useState(false)
   const [fileReadCompleted, setFileReadCompleted] = useState(false)
+  const [removedLayerIds, setRemovedLayerIds] = useState<string[]>([])
 
   const router = useRouter()
   const pathname = usePathname()
@@ -34,26 +44,68 @@ export default function AddTrackPage() {
     [searchParams]
   )
 
+  const { toast } = useToast()
+  const handleDelete = (travelDayData: TravelDayData) => {
+    const id = travelDayData.date.toString()
+
+    toast({
+      title: "Delete Item from List",
+      description: `Deleted: ${travelDayData.date.toDateString()}`,
+      action: (
+        <ToastAction altText="Undo" onClick={() => handleUndo(id)}>
+          Undo
+        </ToastAction>
+      ),
+      variant: "destructive",
+    })
+
+    setRemovedLayerIds([...removedLayerIds, id])
+  }
+
+  const handleUndo = (id: string) => {
+    setRemovedLayerIds(removedLayerIds.filter((item) => item !== id))
+  }
+
+  const filterDeleted = (travelDayData: TravelDayData) => {
+    const id = travelDayData.date.toString()
+    return !removedLayerIds.includes(id)
+  }
+
   return (
     <div>
-      {true && step === "show-map" ? (
-        <div>
+      {step === "show-map" ? (
+        <div className="md:flex">
           <Map
-            className="h-96"
-            lineStrings={travelDayDataList.map((item) => {
+            className="h-[calc(100vh-24rem-4rem-1px)] md:h-[calc(100vh-4rem-1px)] md:w-2/3"
+            lineStrings={travelDayDataList.map((travelDayData) => {
               const lineString: GeoJSON.Feature<
                 GeoJSON.LineString,
                 LineStringProperties
               > = {
-                geometry: item.lineString.geometry,
-                properties: item.lineString.properties,
+                geometry: travelDayData.lineString.geometry,
+                properties: travelDayData.lineString.properties,
                 type: "Feature",
-                id: item.date.toString(),
-                bbox: item.lineString?.bbox,
+                id: travelDayData.date.toString(),
+                bbox: travelDayData.lineString?.bbox,
               }
               return lineString
             })}
+            removedLayerIds={removedLayerIds}
           />
+          <div className="h-96 md:h-[calc(100vh-4rem-1px)] md:w-1/3">
+            <ScrollArea className="h-full w-full">
+              {travelDayDataList
+                .filter(filterDeleted)
+                .map((travelDayData, index) => (
+                  <div className="m-2" key={index}>
+                    <TravelDayCards
+                      travelDayData={travelDayData}
+                      handleDelete={handleDelete}
+                    />
+                  </div>
+                ))}
+            </ScrollArea>
+          </div>
         </div>
       ) : (
         <div className="container m-auto pb-8 pt-6 sm:w-3/5">
@@ -72,7 +124,6 @@ export default function AddTrackPage() {
               <Button
                 className="mt-4 w-full"
                 onClick={() => {
-                  setShowMap(true)
                   setFileReadCompleted(false)
                   router.push(
                     pathname + "?" + createQueryString("step", "show-map")
@@ -87,5 +138,35 @@ export default function AddTrackPage() {
         </div>
       )}
     </div>
+  )
+}
+
+type TravelDayDataProps = {
+  travelDayData: TravelDayData
+  handleDelete: (travelDayData: TravelDayData) => void
+}
+
+function TravelDayCards({ travelDayData, handleDelete }: TravelDayDataProps) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex place-content-between">
+          <div>{travelDayData.date.toDateString()}</div>
+          <div>
+            <Button
+              variant={"ghost"}
+              onClick={() => handleDelete(travelDayData)}
+            >
+              <Icons.trash2 width={20} height={20} />
+              <span className="sr-only">Delete</span>
+            </Button>
+          </div>
+        </CardTitle>
+        <CardDescription>
+          Distanz:{" "}
+          {length(travelDayData.lineString, { units: "kilometers" }).toFixed(2)}
+        </CardDescription>
+      </CardHeader>
+    </Card>
   )
 }
