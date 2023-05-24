@@ -111,6 +111,11 @@ export default function AddTrackPage() {
             removedLayerIds={removedLayerIds}
           />
           <div className="h-96 md:h-[calc(100vh-4rem-1px)] md:w-1/3">
+            <div className="flex justify-center p-4">
+              <Button className="w-full max-w-xs items-center">
+                <Icons.upload className="mr-2 h-4 w-4" /> Upload
+              </Button>
+            </div>
             <ScrollArea className="h-full w-full">
               {travelDayDataList
                 .filter(filterDeleted)

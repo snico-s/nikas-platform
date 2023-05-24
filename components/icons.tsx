@@ -9,6 +9,7 @@ import {
   SunMedium,
   Trash2,
   Twitter,
+  Upload,
   User,
   X,
   type Icon as LucideIcon,
@@ -28,6 +29,7 @@ export const Icons = {
   user: User,
   pencil: Pencil,
   rotateCcw: RotateCcw,
+  upload: Upload,
 
   google: (props: LucideProps) => (
     <svg
