@@ -1,9 +1,11 @@
 import {
+  Calendar,
   LogOut,
   LucideProps,
   Menu,
   Moon,
   Pencil,
+  RotateCcw,
   SunMedium,
   Trash2,
   Twitter,
@@ -18,12 +20,14 @@ export const Icons = {
   sun: SunMedium,
   moon: Moon,
   close: X,
+  calendar: Calendar,
   menu: Menu,
   twitter: Twitter,
   logout: LogOut,
   trash2: Trash2,
   user: User,
   pencil: Pencil,
+  rotateCcw: RotateCcw,
 
   google: (props: LucideProps) => (
     <svg

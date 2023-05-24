@@ -1,6 +1,7 @@
 "use client"
 
 import { Dispatch, SetStateAction, useState } from "react"
+import length from "@turf/length"
 
 import { FileData, TravelDayData } from "@/types/geo"
 import { concatLineStrings, gpxToLineString } from "@/lib/geoHelpers"
@@ -64,6 +65,7 @@ export default function GPXInput({
       return console.error("Error: Reading Error")
     }
 
+    // generate one single LineString from input-file
     const lineString = gpxToLineString(event.target.result)
 
     if (lineString === null) {
@@ -72,6 +74,7 @@ export default function GPXInput({
 
     const time = lineString.properties.time
     const date = new Date(time.slice(0, 10))
+    const distance = Math.round(length(lineString) * 100) / 100
 
     const routeFileData: FileData = {
       filename: file.name,
@@ -93,6 +96,7 @@ export default function GPXInput({
             date,
             lineString,
             fileData: [routeFileData],
+            distance: distance,
           },
         ]
       }
@@ -100,18 +104,18 @@ export default function GPXInput({
       const next: TravelDayData[] = prev.map((item) => {
         if (!sameDate(item.date, date)) return item
 
+        const newDistance = item.distance + distance
         const newLineString = concatLineStrings(item.lineString, lineString)
         return {
           ...item,
           lineString: newLineString,
+          distance: newDistance,
           fileData: [...item.fileData, routeFileData],
         }
       })
 
       return next
     })
-
-    console.log(lineString)
   }
 
   return (

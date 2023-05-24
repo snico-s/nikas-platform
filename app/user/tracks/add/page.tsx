@@ -1,21 +1,35 @@
 "use client"
 
-import { useCallback, useState } from "react"
+import { Dispatch, SetStateAction, useCallback, useState } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import length from "@turf/length"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { format } from "date-fns"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
 
 import { TravelDayData } from "@/types/geo"
 import { LineStringProperties } from "@/lib/geoHelpers"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { Input } from "@/components/ui/input"
 import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { ToastAction } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/form"
 import { Icons } from "@/components/icons"
 import Map from "@/components/map"
 
@@ -149,44 +163,180 @@ export default function AddTrackPage() {
 type TravelDayListItemProps = {
   travelDayData: TravelDayData
   handleDelete: (travelDayData: TravelDayData) => void
+  setTravelDayDataList?: Dispatch<SetStateAction<TravelDayData[]>>
 }
+
+const FormSchema = z.object({
+  date: z.date(),
+  distance: z.number().multipleOf(0.01, {
+    message: "Two decimals are allowed",
+  }),
+})
 
 function TravelDayListItem({
   travelDayData,
   handleDelete,
+  setTravelDayDataList,
 }: TravelDayListItemProps) {
-  return (
-    <li className="flex place-content-between items-center rounded-md p-2 hover:bg-accent hover:text-accent-foreground">
-      <div className="">
-        <div className="text-sm font-medium">
-          {travelDayData.date.toDateString()}
-        </div>
-        <div className="text-sm text-muted-foreground">
-          Distance:{" "}
-          {length(travelDayData.lineString, {
-            units: "kilometers",
-          }).toFixed(2)}
-        </div>
-      </div>
+  const [edit, setEdit] = useState(false)
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      date: travelDayData.date,
+      distance: travelDayData.distance,
+    },
+  })
 
-      <div>
-        <Button
-          className="px-2"
-          variant={"ghost"}
-          onClick={() => console.log("edit")}
-        >
-          <Icons.pencil width={16} height={16} />
-          <span className="sr-only">Edit</span>
-        </Button>
-        <Button
-          className="px-2"
-          variant={"ghost"}
-          onClick={() => handleDelete(travelDayData)}
-        >
-          <Icons.trash2 width={16} height={16} />
-          <span className="sr-only">Delete</span>
-        </Button>
-      </div>
+  const onSubmit = () => {
+    setEdit(false)
+  }
+
+  const onCancel = () => {
+    form.reset()
+    setEdit(false)
+  }
+
+  return (
+    <li className="">
+      {edit ? (
+        <div className="rounded-lg border p-2 shadow-sm">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="flex flex-col"
+            >
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem className="flex items-center ">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "yyyy-MM-dd")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <Icons.calendar className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={(event) => event && field.onChange(event)}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                          }
+                          defaultMonth={travelDayData.date}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                    <div>
+                      <Button
+                        className="ml-2 p-2"
+                        variant={"ghost"}
+                        onClick={(e) => {
+                          e.preventDefault()
+                          form.resetField("date")
+                        }}
+                      >
+                        <Icons.rotateCcw width={16} height={16} />
+                        <span className="sr-only">Reset Date</span>
+                      </Button>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="distance"
+                render={({ field }) => (
+                  <FormItem className="flex items-center ">
+                    <FormControl>
+                      <Input
+                        placeholder="Distance"
+                        type="number"
+                        {...field}
+                        onChange={(event) => {
+                          const newDistance: number = parseFloat(
+                            event.target.value
+                          )
+                          const rounded = Math.round(newDistance * 100) / 100
+                          field.onChange(rounded)
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                    <div>
+                      <Button
+                        className="ml-2 p-2"
+                        variant={"ghost"}
+                        onClick={(e) => {
+                          e.preventDefault()
+                          form.resetField("distance")
+                        }}
+                      >
+                        <Icons.rotateCcw width={16} height={16} />
+                        <span className="sr-only">Reset Distance</span>
+                      </Button>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <div className="mt-2 flex justify-end space-x-2">
+                <Button size="sm" type="submit">
+                  Submit
+                </Button>
+
+                <Button size="sm" variant="outline" onClick={onCancel}>
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </div>
+      ) : (
+        <div className="flex place-content-between items-center rounded-md p-2 hover:bg-accent hover:text-accent-foreground">
+          <div>
+            <div className="text-sm font-medium">
+              {form.getValues().date.toDateString()}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              Distance: {form.getValues().distance.toFixed(2)} km
+            </div>
+          </div>
+
+          <div>
+            <Button
+              className="px-2"
+              variant={"ghost"}
+              onClick={() => setEdit(true)}
+            >
+              <Icons.pencil width={16} height={16} />
+              <span className="sr-only">Edit</span>
+            </Button>
+            <Button
+              className="px-2"
+              variant={"ghost"}
+              onClick={() => handleDelete(travelDayData)}
+            >
+              <Icons.trash2 width={16} height={16} />
+              <span className="sr-only">Delete</span>
+            </Button>
+          </div>
+        </div>
+      )}
     </li>
   )
 }

@@ -52,8 +52,6 @@ export default function Map({
   function addGeoJsonToMap(geoJson: GeoJSON.Feature, map: maplibregl.Map) {
     const id = geoJson.id?.toString() || generateRandomString()
 
-    console.log("Hier")
-    console.log(map.getLayer(id))
     if (map.getLayer(id)) return
 
     map.addSource(id, {
