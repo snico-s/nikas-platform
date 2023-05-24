@@ -28,13 +28,11 @@ const Swiper = ({ children, handler, setWidth }: SwiperProps) => {
     },
     onSwiping: (eventData) => {
       const deltaX = eventData.deltaX
-      console.log(deltaX)
       if (deltaX < 10) setWidth("w-4/5")
       if (deltaX > 20) setWidth("w-2/5")
     },
     onSwipedRight: (eventData) => {
       const deltaX = eventData.deltaX
-      console.log(deltaX)
       setWidth("w-1/5")
       setTimeout(() => {
         handler(false)
