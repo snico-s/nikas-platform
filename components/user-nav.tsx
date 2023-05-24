@@ -25,7 +25,9 @@ export default function UserNav() {
       <DropdownMenuTrigger>
         <Avatar className="justify-center hover:border-[1px] hover:border-ring/70">
           {/* <AvatarImage src="https://github.com/shadcn.png" /> */}
-          <AvatarFallback>{session?.user.name?.at(0)}</AvatarFallback>
+          <AvatarFallback>
+            <Icons.user />
+          </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="m-2 p-2">

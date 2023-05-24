@@ -6,6 +6,7 @@ import {
   SunMedium,
   Trash2,
   Twitter,
+  User,
   X,
   type Icon as LucideIcon,
 } from "lucide-react"
@@ -20,6 +21,7 @@ export const Icons = {
   twitter: Twitter,
   logout: LogOut,
   trash2: Trash2,
+  user: User,
 
   google: (props: LucideProps) => (
     <svg
