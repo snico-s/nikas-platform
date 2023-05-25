@@ -123,6 +123,7 @@ export default function GPXInput({
       <form>
         <Label htmlFor="terms">Choose one ore more GPX-Files</Label>
         <Input
+          className="mt-2"
           type="file"
           name="gpx"
           onChange={handleGpxInput}

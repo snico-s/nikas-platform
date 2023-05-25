@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { signOut, useSession } from "next-auth/react"
+import { signOut } from "next-auth/react"
 
 import { siteConfig } from "@/config/site"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -18,14 +18,12 @@ import { Icons } from "@/components/icons"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function UserNav() {
-  const { data: session } = useSession()
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
         <Avatar className="justify-center hover:border-[1px] hover:border-ring/70">
           {/* <AvatarImage src="https://github.com/shadcn.png" /> */}
-          <AvatarFallback>
+          <AvatarFallback className="bg-background">
             <Icons.user />
           </AvatarFallback>
         </Avatar>

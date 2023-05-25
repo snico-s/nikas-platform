@@ -110,24 +110,25 @@ export default function AddTrackPage() {
             })}
             removedLayerIds={removedLayerIds}
           />
-          <div className="h-96 md:h-[calc(100vh-4rem-1px)] md:w-1/3">
-            <div className="flex justify-center p-4">
+          <div className="h-96 md:h-[calc(100vh-4rem-3.5rem-1px)] md:w-1/3">
+            <div className=" grid h-14 place-items-center px-2">
               <Button className="w-full max-w-xs items-center">
                 <Icons.upload className="mr-2 h-4 w-4" /> Upload
               </Button>
             </div>
             <ScrollArea className="h-full w-full">
-              {travelDayDataList
-                .filter(filterDeleted)
-                .sort(handleSort)
-                .map((travelDayData, index) => (
-                  <ol className="m-2" key={index}>
+              <ol className="m-2">
+                {travelDayDataList
+                  .filter(filterDeleted)
+                  .sort(handleSort)
+                  .map((travelDayData, index) => (
                     <TravelDayListItem
+                      key={index}
                       travelDayData={travelDayData}
                       handleDelete={handleDelete}
                     />
-                  </ol>
-                ))}
+                  ))}
+              </ol>
             </ScrollArea>
           </div>
         </div>
@@ -148,7 +149,7 @@ export default function AddTrackPage() {
               <Button
                 className="mt-4 w-full"
                 onClick={() => {
-                  setFileReadCompleted(false)
+                  // setFileReadCompleted(false)
                   router.push(
                     pathname + "?" + createQueryString("step", "show-map")
                   )
@@ -173,7 +174,7 @@ type TravelDayListItemProps = {
 
 const FormSchema = z.object({
   date: z.date(),
-  distance: z.number().multipleOf(0.01, {
+  distance: z.number().multipleOf(0.03, {
     message: "Two decimals are allowed",
   }),
 })
@@ -204,7 +205,7 @@ function TravelDayListItem({
   return (
     <li className="">
       {edit ? (
-        <div className="rounded-lg border p-2 shadow-sm">
+        <div className="m-2 rounded-lg border p-2 shadow-sm">
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
@@ -214,88 +215,94 @@ function TravelDayListItem({
                 control={form.control}
                 name="date"
                 render={({ field }) => (
-                  <FormItem className="flex items-center ">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "yyyy-MM-dd")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <Icons.calendar className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={(event) => event && field.onChange(event)}
-                          disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
-                          }
-                          defaultMonth={travelDayData.date}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                    <div>
-                      <Button
-                        className="ml-2 p-2"
-                        variant={"ghost"}
-                        onClick={(e) => {
-                          e.preventDefault()
-                          form.resetField("date")
-                        }}
-                      >
-                        <Icons.rotateCcw width={16} height={16} />
-                        <span className="sr-only">Reset Date</span>
-                      </Button>
+                  <FormItem className="mt-2 flex flex-col">
+                    <FormLabel>Date</FormLabel>
+                    <div className="item-center flex">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "yyyy-MM-dd")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <Icons.calendar className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={(event) => event && field.onChange(event)}
+                            disabled={(date) =>
+                              date > new Date() || date < new Date("1900-01-01")
+                            }
+                            defaultMonth={travelDayData.date}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <div>
+                        <Button
+                          className="ml-2 p-2"
+                          variant={"ghost"}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            form.resetField("date")
+                          }}
+                        >
+                          <Icons.rotateCcw width={16} height={16} />
+                          <span className="sr-only">Reset Date</span>
+                        </Button>
+                      </div>
                     </div>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
               <FormField
                 name="distance"
                 render={({ field }) => (
-                  <FormItem className="flex items-center ">
-                    <FormControl>
-                      <Input
-                        placeholder="Distance"
-                        type="number"
-                        {...field}
-                        onChange={(event) => {
-                          const newDistance: number = parseFloat(
-                            event.target.value
-                          )
-                          const rounded = Math.round(newDistance * 100) / 100
-                          field.onChange(rounded)
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                    <div>
-                      <Button
-                        className="ml-2 p-2"
-                        variant={"ghost"}
-                        onClick={(e) => {
-                          e.preventDefault()
-                          form.resetField("distance")
-                        }}
-                      >
-                        <Icons.rotateCcw width={16} height={16} />
-                        <span className="sr-only">Reset Distance</span>
-                      </Button>
+                  <FormItem className="mt-2 flex flex-col">
+                    <FormLabel>Distance (in km)</FormLabel>
+                    <div className="item-center flex">
+                      <FormControl>
+                        <Input
+                          placeholder="Distance"
+                          type="number"
+                          {...field}
+                          onChange={(event) => {
+                            const newDistance: number = parseFloat(
+                              event.target.value
+                            )
+                            const rounded = Math.round(newDistance * 100) / 100
+                            field.onChange(rounded)
+                          }}
+                        />
+                      </FormControl>
+                      <div>
+                        <Button
+                          className="ml-2 p-2"
+                          variant={"ghost"}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            form.resetField("distance")
+                          }}
+                        >
+                          <Icons.rotateCcw width={16} height={16} />
+                          <span className="sr-only">Reset Distance</span>
+                        </Button>
+                      </div>
                     </div>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -312,7 +319,7 @@ function TravelDayListItem({
           </Form>
         </div>
       ) : (
-        <div className="flex place-content-between items-center rounded-md p-2 hover:bg-accent hover:text-accent-foreground">
+        <div className="flex place-content-between items-center rounded-xl p-2 hover:bg-accent hover:text-accent-foreground">
           <div>
             <div className="text-sm font-medium">
               {form.getValues().date.toDateString()}
