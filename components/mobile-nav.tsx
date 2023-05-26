@@ -51,13 +51,10 @@ export function MobileNav({ items, children }: MobileNavProps) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button
-          variant="ghost"
-          className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
-        >
-          {!open && <Icons.menu />}
+        <button className="mr-2 rounded-md p-2 text-base ring-offset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-0 md:hidden">
+          {!open && <Icons.menu className="z-50" />}
           <span className="sr-only">Toggle Menu</span>
-        </Button>
+        </button>
       </SheetTrigger>
 
       <SheetContent className={cn(widht)}>

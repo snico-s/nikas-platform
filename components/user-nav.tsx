@@ -20,7 +20,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 export default function UserNav() {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-0 ">
         <Avatar className="justify-center hover:border-[1px] hover:border-ring/70">
           {/* <AvatarImage src="https://github.com/shadcn.png" /> */}
           <AvatarFallback className="bg-background">
