@@ -1,5 +1,6 @@
 import {
   Calendar,
+  Loader2,
   LogOut,
   LucideProps,
   Menu,
@@ -30,6 +31,7 @@ export const Icons = {
   pencil: Pencil,
   rotateCcw: RotateCcw,
   upload: Upload,
+  loader2: Loader2,
 
   google: (props: LucideProps) => (
     <svg

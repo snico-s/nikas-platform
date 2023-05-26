@@ -1,5 +1,3 @@
-import { Feature } from "maplibre-gl"
-
 import { LineStringProperties } from "@/lib/geoHelpers"
 
 export type FileData = {
@@ -14,3 +12,30 @@ export type TravelDayData = {
   fileData: FileData[]
   distance: number
 }
+
+// types for ts-to-zod
+
+// export type BBox =
+//   | [number, number, number, number]
+//   | [number, number, number, number, number, number]
+
+// export interface GeoJsonObject {
+//   type: "LineString"
+//   bbox?: BBox | undefined
+// }
+
+// export type Position = number[] // [number, number] | [number, number, number];
+
+// export interface LineString extends GeoJsonObject {
+//   type: "LineString"
+//   coordinates: Position[]
+// }
+
+// export type FeatureWithLineString = {
+//   type: "Feature"
+//   id?: any
+//   properties: {
+//     [_: string]: any
+//   }
+//   geometry: LineString
+// }

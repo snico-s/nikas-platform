@@ -121,7 +121,7 @@ export default function GPXInput({
   return (
     <div>
       <form>
-        <Label htmlFor="terms">Choose one ore more GPX-Files</Label>
+        <Label htmlFor="gpx">Choose one ore more GPX-Files</Label>
         <Input
           className="mt-2"
           type="file"

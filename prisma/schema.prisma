@@ -9,16 +9,6 @@ datasource db {
   extensions = [postgis(version: "3.3.2"), uuid_ossp(map: "uuid-ossp", schema: "extensions")]
 }
 
-// model restaurants {
-//   id       Int                      @id @default(autoincrement())
-//   name     String
-//   location Unsupported("geography")
-//   track    Unsupported("geography")
-
-//   @@index([location], map: "restaurants_geo_index", type: Gist)
-//   @@index([track], map: "restaurants_geo_index_track", type: Gist)
-// }
-
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -66,12 +56,11 @@ model VerificationToken {
 
 model Track {
   id         String                   @id @default(cuid())
-  type       String
   track      Unsupported("geography")
-  // simplifiedCoordinates Json
   properties Json
-  createdAt  DateTime                 @default(now())
-  createdBy  String?
+  dat        DateTime
+  createdat  DateTime                 @default(now())
+  createdBy  String?                  @map("created_by")
 
   User User? @relation(fields: [createdBy], references: [id])
 

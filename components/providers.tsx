@@ -8,7 +8,7 @@ interface Props {
   children: React.ReactNode
 }
 
-const Provider = ({ children }: Props) => {
+const Providers = ({ children }: Props) => {
   return (
     <SessionProvider>
       {children}
@@ -17,4 +17,4 @@ const Provider = ({ children }: Props) => {
   )
 }
 
-export default Provider
+export default Providers

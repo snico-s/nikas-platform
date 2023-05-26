@@ -32,21 +32,19 @@ export default function Map({
   }, [])
 
   useEffect(() => {
-    if (!map.current) return
-    map.current.on("load", () => {
-      if (!map.current || !lineStrings || lineStrings.length === 0) return
-      const bounds = new LngLatBounds()
+    if (!map.current || !map.current.loaded) return
+    if (!map.current || !lineStrings || lineStrings.length === 0) return
+    const bounds = new LngLatBounds()
 
-      for (const lineString of lineStrings) {
-        addGeoJsonToMap(lineString, map.current)
+    for (const lineString of lineStrings) {
+      addGeoJsonToMap(lineString, map.current)
 
-        lineString.geometry.coordinates.forEach((coordinate) => {
-          bounds.extend([coordinate[0], coordinate[1]])
-        })
-      }
+      lineString.geometry.coordinates.forEach((coordinate) => {
+        bounds.extend([coordinate[0], coordinate[1]])
+      })
+    }
 
-      map.current.fitBounds(bounds, { padding: 20 })
-    })
+    map.current.fitBounds(bounds, { padding: 20 })
   }, [lineStrings])
 
   function addGeoJsonToMap(geoJson: GeoJSON.Feature, map: maplibregl.Map) {
