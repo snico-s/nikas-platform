@@ -64,6 +64,7 @@ function TravelDayListItem({
   }
 
   useEffect(() => {
+    console.log("useEffect Upload")
     const onSubmit: SubmitHandler<z.infer<typeof trackCreateSchema>> = async (
       formData
     ) => {

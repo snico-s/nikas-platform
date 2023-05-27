@@ -1,6 +1,7 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import { useRouter } from "next/navigation"
 
 import { TravelDayData } from "@/types/geo"
 import { LineStringProperties } from "@/lib/geoHelpers"
@@ -24,7 +25,12 @@ export default function AddTrackPage() {
   const [upload, setUpload] = useState(false)
 
   const [uploading, setUploading] = useState(false)
-  const uploadButton = useRef()
+
+  const router = useRouter()
+
+  useEffect(() => {
+    if (upload && travelDayDataList.length === 0) router.push("/user/tracks/")
+  }, [travelDayDataList, upload, router])
 
   const { toast } = useToast()
   const handleDelete = (travelDayData: TravelDayData) => {
