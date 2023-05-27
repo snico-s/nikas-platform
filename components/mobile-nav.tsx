@@ -4,7 +4,6 @@ import { useSwipeable } from "react-swipeable"
 
 import { NavItem } from "@/types/nav"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
 import { Icons } from "./icons"
