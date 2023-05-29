@@ -1,6 +1,7 @@
 import {
   ArrowRight,
   Calendar,
+  Coins,
   Loader2,
   LogOut,
   LucideProps,
@@ -42,6 +43,7 @@ export const Icons = {
   map: Map,
   ellipsis: MoreVertical,
   moveHorizontal: MoveHorizontal,
+  coins: Coins,
 
   google: (props: LucideProps) => (
     <svg

@@ -44,6 +44,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   Track         Track[]
+  Expense       Expense[]
 }
 
 model VerificationToken {
@@ -66,4 +67,29 @@ model Track {
   User User? @relation(fields: [createdBy], references: [id])
 
   @@index([track], map: "restaurants_geo_index_track", type: Gist)
+}
+
+model Expense {
+  id               Int      @id @default(autoincrement())
+  amount           Decimal
+  category         String?
+  description      String?
+  currencyId       String
+  date             DateTime
+  exchangeRate     Decimal
+  exchangeTargetId String
+  createdBy        String
+
+  User     User?    @relation(fields: [createdBy], references: [id])
+  currency Currency @relation(fields: [currencyId, exchangeTargetId], references: [curreny, targetCurreny])
+}
+
+model Currency {
+  curreny       String
+  targetCurreny String
+  name          String    @unique
+  exchangeRate  Decimal?
+  Expense       Expense[]
+
+  @@unique([curreny, targetCurreny])
 }

@@ -24,9 +24,9 @@ export const dashboardConfig: DashboardConfig = {
       icon: "map",
     },
     {
-      title: "Timelines",
-      href: "/dashboard/timelines",
-      // icon: "settings",
+      title: "Expenses",
+      href: "/user/expenses",
+      icon: "coins",
     },
   ],
 }
