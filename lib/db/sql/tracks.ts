@@ -3,7 +3,7 @@ import { Track } from "@prisma/client"
 
 import { TrackWithoutProperties } from "@/types/geo"
 import { authOptions } from "@/lib/auth"
-import { prisma } from "@/lib/db/db"
+import { prisma } from "@/lib/db"
 import { getCurrentUser } from "@/lib/session"
 
 type SqlReturnType = {

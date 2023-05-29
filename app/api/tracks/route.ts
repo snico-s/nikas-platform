@@ -1,4 +1,4 @@
-import { Prisma, Track } from "@prisma/client"
+import { Track } from "@prisma/client"
 import cuid from "cuid"
 import { getServerSession } from "next-auth/next"
 import * as z from "zod"
@@ -6,7 +6,7 @@ import * as z from "zod"
 import { PgLineString, TrackWithoutProperties } from "@/types/geo"
 import { trackCreateSchema } from "@/types/zod"
 import { authOptions } from "@/lib/auth"
-import { prisma } from "@/lib/db/db"
+import { prisma } from "@/lib/db"
 
 type SqlReturnTypeWithoutTrackAndProperties = {
   created_at: Date

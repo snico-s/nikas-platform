@@ -5,7 +5,7 @@ import * as z from "zod"
 
 import { PgLineString, TrackWithTrack } from "@/types/geo"
 import { authOptions } from "@/lib/auth"
-import { prisma } from "@/lib/db/db"
+import { prisma } from "@/lib/db"
 
 const routeContextSchema = z.object({
   params: z.object({
