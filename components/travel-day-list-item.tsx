@@ -69,7 +69,7 @@ function TravelDayListItem({
       formData
     ) => {
       try {
-        const response = await fetch("/api/track", {
+        const response = await fetch("/api/tracks", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

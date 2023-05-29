@@ -58,8 +58,8 @@ model Track {
   id         String                   @id @default(cuid())
   track      Unsupported("geography")
   properties Json
-  dat        DateTime
-  createdat  DateTime                 @default(now())
+  date       DateTime
+  createdAt  DateTime                 @default(now()) @map("created_at")
   createdBy  String?                  @map("created_by")
 
   User User? @relation(fields: [createdBy], references: [id])

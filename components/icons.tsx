@@ -1,10 +1,13 @@
 import {
+  ArrowRight,
   Calendar,
   Loader2,
   LogOut,
   LucideProps,
+  Map,
   Menu,
   Moon,
+  MoreVertical,
   Pencil,
   RotateCcw,
   SunMedium,
@@ -32,6 +35,9 @@ export const Icons = {
   rotateCcw: RotateCcw,
   upload: Upload,
   loader2: Loader2,
+  arrowRight: ArrowRight,
+  map: Map,
+  ellipsis: MoreVertical,
 
   google: (props: LucideProps) => (
     <svg

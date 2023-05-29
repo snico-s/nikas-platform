@@ -1,4 +1,3 @@
-import { useCallback } from "react"
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -12,6 +11,19 @@ export const sameDate = (date1: Date, date2: Date): boolean => {
     date1.getMonth() === date2.getMonth() &&
     date1.getDate() === date2.getDate()
   )
+}
+
+export function formatDate(input: string | number): string {
+  const date = new Date(input)
+
+  // TODO: i11n
+  // see https://stackoverflow.com/questions/45241153/is-there-any-way-to-access-the-current-locale-with-react-intl
+
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  })
 }
 
 export function generateRandomString(length: number = 10) {

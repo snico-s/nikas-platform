@@ -1,3 +1,5 @@
+import { Track } from "@prisma/client"
+
 import { LineStringProperties } from "@/lib/geoHelpers"
 
 export type FileData = {
@@ -12,6 +14,17 @@ export type TravelDayData = {
   fileData: FileData[]
   distance: number
 }
+
+export type PgLineString = {
+  type: string
+  coordinates: number[][]
+}
+
+export type TrackWithTrack = {
+  track: PgLineString
+} & Track
+
+export type TrackWithoutProperties = Omit<Track, "properties">
 
 // types for ts-to-zod
 

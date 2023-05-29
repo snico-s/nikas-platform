@@ -9,11 +9,10 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { ToastAction } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
+import GPXInput from "@/components/gpx-input"
 import { Icons } from "@/components/icons"
 import Map from "@/components/map"
-
-import GPXInput from "./gpx-input"
-import TravelDayListItem from "./travel-day-list-item"
+import TravelDayListItem from "@/components/travel-day-list-item"
 
 export default function AddTrackPage() {
   const [unsuccessful, setUnsuccessful] = useState<string[]>([])
