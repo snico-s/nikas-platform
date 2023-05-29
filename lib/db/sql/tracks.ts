@@ -20,7 +20,7 @@ export async function getTracksForDashboard() {
 
   const result = await prisma.$queryRaw<
     SqlReturnType[]
-  >`SELECT id, created_by, created_at, date
+  >`SELECT id, created_by, created_at, date, distance
   FROM "Track" 
   WHERE created_by = ${user.id}`
 
@@ -31,6 +31,7 @@ export async function getTracksForDashboard() {
     createdAt: item.created_at,
     createdBy: item.created_by,
     date: new Date(item.date),
+    distance: item.distance,
   }))
 
   console.log(result)

@@ -1,7 +1,8 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { redirect, useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 
 import { TravelDayData } from "@/types/geo"
 import { LineStringProperties } from "@/lib/geoHelpers"
@@ -31,7 +32,13 @@ export default function AddTrackPage() {
     if (upload && travelDayDataList.length === 0) router.push("/user/tracks/")
   }, [travelDayDataList, upload, router])
 
+  const { data: session } = useSession()
+
   const { toast } = useToast()
+
+  if (!session) {
+    redirect("/signin")
+  }
   const handleDelete = (travelDayData: TravelDayData) => {
     const id = travelDayData.date.toString()
 

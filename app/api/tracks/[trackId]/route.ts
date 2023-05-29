@@ -49,6 +49,7 @@ export async function GET(
       date: item.date,
       properties: item.properties,
       track: item.track,
+      distance: item.distance,
     }))
 
     return NextResponse.json(res)

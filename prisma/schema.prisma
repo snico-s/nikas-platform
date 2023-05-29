@@ -59,6 +59,7 @@ model Track {
   track      Unsupported("geography")
   properties Json
   date       DateTime
+  distance   Decimal
   createdAt  DateTime                 @default(now()) @map("created_at")
   createdBy  String?                  @map("created_by")
 

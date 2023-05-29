@@ -8,7 +8,9 @@ import {
   Menu,
   Moon,
   MoreVertical,
+  MoveHorizontal,
   Pencil,
+  Plus,
   RotateCcw,
   SunMedium,
   Trash2,
@@ -22,6 +24,7 @@ import {
 export type Icon = LucideIcon
 
 export const Icons = {
+  add: Plus,
   sun: SunMedium,
   moon: Moon,
   close: X,
@@ -38,6 +41,7 @@ export const Icons = {
   arrowRight: ArrowRight,
   map: Map,
   ellipsis: MoreVertical,
+  moveHorizontal: MoveHorizontal,
 
   google: (props: LucideProps) => (
     <svg

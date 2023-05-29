@@ -4,12 +4,13 @@ import { Track } from "@prisma/client"
 import { formatDate } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
+import { Icons } from "./icons"
 import { TrackOperations } from "./track-operations"
 
 // import { PostOperations } from "@/components/post-operations"
 
 interface TrackItemProps {
-  track: Pick<Track, "id" | "date">
+  track: Pick<Track, "id" | "date" | "distance">
 }
 
 export function TrackItem({ track }: TrackItemProps) {
@@ -22,10 +23,14 @@ export function TrackItem({ track }: TrackItemProps) {
         >
           {track.date.toDateString()}
         </Link>
-        <div>
-          <p className="text-sm text-muted-foreground">
+        <div className="flex flex-wrap gap-3">
+          <div className="text-sm text-muted-foreground">
             {formatDate(track.date?.toDateString())}
-          </p>
+          </div>
+          <div className="flex gap-1 text-sm text-muted-foreground">
+            <Icons.moveHorizontal className="h-5 w-5" />
+            <div>{track.distance.toFixed(2)} km</div>
+          </div>
         </div>
       </div>
       <TrackOperations track={{ id: track.id }} />

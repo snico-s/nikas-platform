@@ -3,7 +3,7 @@ import cuid from "cuid"
 import { getServerSession } from "next-auth/next"
 import * as z from "zod"
 
-import { PgLineString, TrackWithoutProperties } from "@/types/geo"
+import { TrackWithoutProperties } from "@/types/geo"
 import { trackCreateSchema } from "@/types/zod"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/db"
@@ -36,6 +36,7 @@ export async function GET() {
       createdAt: item.created_at,
       createdBy: item.created_by,
       date: item.date,
+      distance: item.distance,
     }))
 
     return new Response(JSON.stringify(res))
@@ -66,10 +67,11 @@ export async function POST(req: Request) {
     const lineString = body.track.geometry
 
     const result = await prisma.$queryRaw`
-        INSERT into "Track" (id, date, created_by, properties, track)
+        INSERT into "Track" (id, date, distance, created_by, properties, track)
         values (
           ${newId}, 
           ${body.date},
+          ${body.distance},
           ${user.id},
           ${body.track.properties} ,
           ST_GeomFromGeoJSON(${lineString})
