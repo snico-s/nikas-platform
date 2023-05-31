@@ -60,7 +60,7 @@ model Track {
   track      Unsupported("geography")
   properties Json
   date       DateTime
-  distance   Decimal
+  distance   Float
   createdAt  DateTime                 @default(now()) @map("created_at")
   createdBy  String?                  @map("created_by")
 
@@ -70,26 +70,46 @@ model Track {
 }
 
 model Expense {
-  id               Int      @id @default(autoincrement())
-  amount           Decimal
-  category         String?
-  description      String?
-  currencyId       String
-  date             DateTime
-  exchangeRate     Decimal
-  exchangeTargetId String
-  createdBy        String
+  id          Int      @id @default(autoincrement())
+  amount      Float
+  categoryId  String?
+  description String?
+  date        DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  currencyId  Int
+  createdBy   String
 
-  User     User?    @relation(fields: [createdBy], references: [id])
-  currency Currency @relation(fields: [currencyId, exchangeTargetId], references: [curreny, targetCurreny])
+  Category ExpenseCategory? @relation(fields: [categoryId], references: [category])
+  User     User?            @relation(fields: [createdBy], references: [id])
+  Currency Currency?        @relation(fields: [currencyId], references: [id])
+}
+
+model ExpenseCategory {
+  category String    @id @unique
+  Expense  Expense[]
 }
 
 model Currency {
-  curreny       String
-  targetCurreny String
-  name          String    @unique
-  exchangeRate  Decimal?
-  Expense       Expense[]
+  id       Int     @id @default(autoincrement())
+  currency String
+  code     String  @unique
+  symbol   String?
 
-  @@unique([curreny, targetCurreny])
+  baseExchangeRates   ExchangeRate[] @relation("BaseCurrency")
+  targetExchangeRates ExchangeRate[] @relation("TargetCurrency")
+  Expense             Expense[]
+}
+
+model ExchangeRate {
+  id               Int   @id @default(autoincrement())
+  rate             Float
+  baseCurrencyId   Int
+  targetCurrencyId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  baseCurrency   Currency? @relation("BaseCurrency", fields: [baseCurrencyId], references: [id])
+  targetCurrency Currency? @relation("TargetCurrency", fields: [targetCurrencyId], references: [id])
 }

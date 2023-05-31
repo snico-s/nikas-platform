@@ -32,8 +32,11 @@ export default async function ExpensesPages() {
     redirect(authOptions?.pages?.signIn || "/login")
   }
 
-  const expneses = await prisma.expense.findMany({
+  const expenses = await prisma.expense.findMany({
     where: { createdBy: user.id },
+    include: {
+      Currency: true,
+    },
   })
 
   return (
@@ -45,9 +48,9 @@ export default async function ExpensesPages() {
         <ExpenseCreateButton />
       </DashboardHeader>
       <div>
-        {expneses?.length ? (
+        {expenses?.length ? (
           <div className="divide-y divide-border rounded-md border">
-            {expneses.map((expense) => (
+            {expenses.map((expense) => (
               <ExpenseItem key={expense.id} expense={expense} />
             ))}
           </div>

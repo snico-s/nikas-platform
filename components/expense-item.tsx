@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Expense } from "@prisma/client"
+import { Currency, Expense } from "@prisma/client"
 
 import { formatDate } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -7,29 +7,28 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Icons } from "./icons"
 
 // import { PostOperations } from "@/components/post-operations"
+type ExpenseWithCurrency = Expense & {
+  Currency: Currency | null
+}
 
-interface ExpenseItemProps {
-  expense: Pick<Expense, "id" | "date" | "amount">
+type ExpenseItemProps = {
+  expense: ExpenseWithCurrency
 }
 
 export function ExpenseItem({ expense }: ExpenseItemProps) {
+  const symbol = expense.Currency?.symbol || expense.Currency?.currency || ""
   return (
     <div className="flex items-center justify-between p-4">
       <div className="grid gap-1">
         <Link
           href={`/expense/edit/${expense.id}`}
-          className="font-semibold hover:underline"
+          className="flex gap-1 font-semibold hover:underline"
         >
-          {expense.date.toDateString()}
+          {expense.amount.toFixed(2)} {symbol}
         </Link>
-        <div className="flex flex-wrap gap-3">
-          <div className="text-sm text-muted-foreground">
-            {formatDate(expense.date?.toDateString())}
-          </div>
-          <div className="flex gap-1 text-sm text-muted-foreground">
-            <Icons.moveHorizontal className="h-5 w-5" />
-            <div>{expense.amount.toFixed(2)} km</div>
-          </div>
+        <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+          <div>{formatDate(expense.date?.toDateString())}</div>
+          <div>{expense.categoryId}</div>
         </div>
       </div>
       {/* <ExpenseOperations expense={{ id: expense.id }} /> */}
