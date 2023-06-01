@@ -15,8 +15,6 @@ type SqlReturnTypeWithoutTrackAndProperties = {
 
 export async function GET() {
   try {
-    console.log("/api/track")
-
     const session = await getServerSession(authOptions)
     if (!session) {
       return new Response("Unauthorized", { status: 403 })
@@ -50,8 +48,6 @@ export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions)
 
-    console.log("POST api/track/")
-
     if (!session) {
       return new Response("Unauthorized", { status: 403 })
     }
@@ -59,7 +55,6 @@ export async function POST(req: Request) {
     const { user } = session
 
     const json = await req.json()
-    console.log(json)
     const readyToParse = { ...json, date: new Date(json.date) }
     const body = trackCreateSchema.parse(readyToParse)
 

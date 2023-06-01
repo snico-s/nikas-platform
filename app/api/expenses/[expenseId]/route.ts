@@ -50,12 +50,8 @@ export async function DELETE(
   _req: Request,
   context: z.infer<typeof routeContextSchema>
 ) {
-  console.log("DELETE /api/expenses/[expensedId]")
   try {
-    console.log(context)
-    console.log(typeof context.params.expenseId)
     const { params } = routeContextSchema.parse(context)
-    console.log("🚀 ~ file: route.ts:20 ~ params:", params)
 
     if (!(await verifyCurrentUserHasAccessToPost(+params.expenseId))) {
       return new Response(null, { status: 403 })
@@ -79,10 +75,6 @@ export async function DELETE(
 
 async function verifyCurrentUserHasAccessToPost(expenseId: number) {
   const session = await getServerSession(authOptions)
-  console.log(
-    "🚀 ~ file: route.ts:43 ~ verifyCurrentUserHasAccessToPost ~ session:",
-    session
-  )
   const count = await prisma.expense.count({
     where: {
       id: expenseId,
