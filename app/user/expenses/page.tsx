@@ -14,7 +14,9 @@ import { DashboardShell } from "@/components/shell"
 
 interface ExpenseCreateButtonProps extends ButtonProps {}
 
-const ExpenseCreateButton = ({ autoFocus }: ExpenseCreateButtonProps) => (
+export const ExpenseCreateButton = ({
+  autoFocus,
+}: ExpenseCreateButtonProps) => (
   <Link href={"/expense/add"} passHref>
     <Button autoFocus={autoFocus}>
       <Icons.add className="mr-2 h-4 w-4" />
