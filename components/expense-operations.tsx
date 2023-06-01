@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Track } from "@prisma/client"
+import { Expense } from "@prisma/client"
 
 import {
   AlertDialog,
@@ -27,15 +27,15 @@ import { Icons } from "@/components/icons"
 
 import { buttonVariants } from "./ui/button"
 
-async function deleteTrack(trackId: string) {
-  const response = await fetch(`/api/tracks/${trackId}`, {
+async function deleteExpense(expenseId: number) {
+  const response = await fetch(`/api/expenses/${expenseId}`, {
     method: "DELETE",
   })
 
   if (!response?.ok) {
     toast({
       title: "Something went wrong.",
-      description: "Your track was not deleted. Please try again.",
+      description: "Your Expense was not deleted. Please try again.",
       variant: "destructive",
     })
   }
@@ -43,11 +43,11 @@ async function deleteTrack(trackId: string) {
   return true
 }
 
-interface TrackOperationsProps {
-  track: Pick<Track, "id">
+interface ExpenseOperationsProps {
+  expense: Pick<Expense, "id">
 }
 
-export function TrackOperations({ track }: TrackOperationsProps) {
+export function ExpenseOperations({ expense }: ExpenseOperationsProps) {
   const router = useRouter()
   const [showDeleteAlert, setShowDeleteAlert] = React.useState<boolean>(false)
   const [isDeleteLoading, setIsDeleteLoading] = React.useState<boolean>(false)
@@ -61,7 +61,7 @@ export function TrackOperations({ track }: TrackOperationsProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem>
-            <Link href={`/track/${track.id}/edit`} className="flex w-full">
+            <Link href={`/expense/${expense.id}/edit`} className="flex w-full">
               Edit
             </Link>
           </DropdownMenuItem>
@@ -78,7 +78,7 @@ export function TrackOperations({ track }: TrackOperationsProps) {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Are you sure you want to delete this track?
+              Are you sure you want to delete this expense?
             </AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone.
@@ -91,7 +91,7 @@ export function TrackOperations({ track }: TrackOperationsProps) {
                 event.preventDefault()
                 setIsDeleteLoading(true)
 
-                const deleted = await deleteTrack(track.id)
+                const deleted = await deleteExpense(expense.id)
 
                 if (deleted) {
                   setIsDeleteLoading(false)

@@ -4,6 +4,8 @@ import { Currency, Expense } from "@prisma/client"
 import { formatDate } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
+import { ExpenseOperations } from "./expense-operations"
+
 type ExpenseWithCurrency = Expense & {
   Currency: Currency | null
 }
@@ -29,7 +31,7 @@ export function ExpenseItem({ expense }: ExpenseItemProps) {
           <div>{expense.categoryId}</div>
         </div>
       </div>
-      {/* <ExpenseOperations expense={{ id: expense.id }} /> */}
+      <ExpenseOperations expense={{ id: expense.id }} />
     </div>
   )
 }
