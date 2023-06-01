@@ -1,4 +1,3 @@
-import { ExpenseItem } from "@/components/expense-item"
 import { DashboardHeader } from "@/components/header"
 import { DashboardShell } from "@/components/shell"
 import { TrackItem } from "@/components/track-item"
