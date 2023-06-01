@@ -1,11 +1,17 @@
-import { redirect } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 
 import { authOptions } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { getCurrentUser } from "@/lib/session"
-import { AddExpenseForm } from "@/components/add-expense"
+import { EditExpense } from "@/components/edit-expense"
 
-export default async function EditExpense() {
+type EditExpensePageProps = {
+  params: { expenseId: string }
+}
+
+export default async function EditExpensePage({
+  params,
+}: EditExpensePageProps) {
   const user = await getCurrentUser()
 
   if (!user) {
@@ -14,19 +20,21 @@ export default async function EditExpense() {
 
   const currencies = await db.currency.findMany()
   const categories = await db.expenseCategory.findMany()
-  const lastExpense = await db.expense.findFirst({
+  const expense = await db.expense.findFirst({
     where: {
+      id: +params.expenseId,
       createdBy: user.id,
     },
-    orderBy: { createdAt: "desc" },
   })
+
+  if (!expense) notFound()
 
   return (
     <div className="container mt-2 max-w-md px-0">
-      <AddExpenseForm
+      <EditExpense
+        expense={expense}
         currencies={currencies}
         categories={categories}
-        lastExpense={lastExpense}
       />
     </div>
   )

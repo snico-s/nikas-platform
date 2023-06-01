@@ -3,9 +3,9 @@ import { redirect } from "next/navigation"
 import { authOptions } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { getCurrentUser } from "@/lib/session"
-import { AddExpenseForm } from "@/components/add-expense"
+import { AddExpense } from "@/components/add-expense"
 
-export default async function AddExpense() {
+export default async function AddExpensePage() {
   const user = await getCurrentUser()
 
   if (!user) {
@@ -23,7 +23,7 @@ export default async function AddExpense() {
 
   return (
     <div className="container mt-2 max-w-md px-0">
-      <AddExpenseForm
+      <AddExpense
         currencies={currencies}
         categories={categories}
         lastExpense={lastExpense}

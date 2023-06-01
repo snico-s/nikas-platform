@@ -1,4 +1,5 @@
 import {
+  AlertTriangle,
   ArrowRight,
   Calendar,
   Coins,
@@ -44,6 +45,7 @@ export const Icons = {
   ellipsis: MoreVertical,
   moveHorizontal: MoveHorizontal,
   coins: Coins,
+  warning: AlertTriangle,
 
   google: (props: LucideProps) => (
     <svg

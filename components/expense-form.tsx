@@ -25,14 +25,6 @@ import { Label } from "./ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
 import { Textarea } from "./ui/textarea"
 
-async function postExpense(data: FormSchema) {
-  const result = await fetch("/api/expenses", {
-    method: "POST",
-    body: JSON.stringify(data),
-  })
-  return result
-}
-
 function setDefaultValues(lastExpense: Expense | null, currencies: Currency[]) {
   if (!lastExpense)
     return {
@@ -48,16 +40,16 @@ function setDefaultValues(lastExpense: Expense | null, currencies: Currency[]) {
   }
 }
 
-type FormSchema = z.infer<typeof createExpensesSchema> // string
+export type ExpenseFormSchema = z.infer<typeof createExpensesSchema> // string
 
-type DefaultValues = Partial<FormSchema>
+export type ExpenseDefaultValues = Partial<ExpenseFormSchema>
 
 type Props = {
   currencies: Currency[]
   categories: ExpenseCategory[]
-  onSubmit: SubmitHandler<FormSchema>
+  onSubmit: SubmitHandler<ExpenseFormSchema>
   loading: boolean
-  defaultValues: DefaultValues
+  defaultValues: ExpenseDefaultValues
 }
 
 export function ExpenseForm({
@@ -74,7 +66,7 @@ export function ExpenseForm({
     trigger,
     getValues,
     formState: { errors },
-  } = useForm<FormSchema>({
+  } = useForm<ExpenseFormSchema>({
     resolver: zodResolver(createExpensesSchema),
     defaultValues,
   })
