@@ -20,7 +20,7 @@ export function ExpenseItem({ expense }: ExpenseItemProps) {
     <div className="flex items-center justify-between p-4">
       <div className="grid gap-1">
         <Link
-          href={`/expense/edit/${expense.id}`}
+          href={`/expense/${expense.id}/edit`}
           className="flex gap-1 font-semibold hover:underline"
         >
           {expense.amount.toFixed(2)} {symbol}

@@ -5,7 +5,7 @@ import { db } from "@/lib/db"
 import { getCurrentUser } from "@/lib/session"
 import { AddExpenseForm } from "@/components/add-expense-form"
 
-export default async function AddExpense() {
+export default async function EditExpense() {
   const user = await getCurrentUser()
 
   if (!user) {
