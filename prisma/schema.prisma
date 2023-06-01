@@ -72,13 +72,14 @@ model Track {
 model Expense {
   id          Int      @id @default(autoincrement())
   amount      Float
-  categoryId  String?
+  categoryId  String
   description String?
   date        DateTime
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
   currencyId  Int
-  createdBy   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String
 
   Category ExpenseCategory? @relation(fields: [categoryId], references: [category])
   User     User?            @relation(fields: [createdBy], references: [id])

@@ -4,9 +4,6 @@ import { Currency, Expense } from "@prisma/client"
 import { formatDate } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
-import { Icons } from "./icons"
-
-// import { PostOperations } from "@/components/post-operations"
 type ExpenseWithCurrency = Expense & {
   Currency: Currency | null
 }
@@ -27,7 +24,8 @@ export function ExpenseItem({ expense }: ExpenseItemProps) {
           {expense.amount.toFixed(2)} {symbol}
         </Link>
         <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-          <div>{formatDate(expense.date?.toDateString())}</div>
+          {/* <div>{formatDate(expense.date?.toDateString())}</div> */}
+          <div>{formatDate(new Date(expense.date).toDateString())}</div>
           <div>{expense.categoryId}</div>
         </div>
       </div>
