@@ -35,8 +35,6 @@ export async function GET(
       return new Response(null, { status: 403 })
     }
 
-    console.log(params.trackId)
-
     const result = await prisma.$queryRaw<
       SqlReturnTypeWithTrack[]
     >`SELECT id, properties, created_by, created_at, ST_AsGeoJSON(track)::jsonb as track

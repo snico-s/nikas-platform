@@ -34,8 +34,5 @@ export async function getTracksForDashboard() {
     distance: item.distance,
   }))
 
-  console.log(result)
-  console.log(res)
-
   return res
 }
