@@ -1,27 +1,18 @@
-import { rejects } from "assert"
 import { gpx } from "@tmcw/togeojson"
 import simplify from "@turf/simplify"
 import truncate from "@turf/truncate"
 import {
+  Feature,
   FeatureCollection,
   GeoJsonProperties,
+  GeoJsonTypes,
   Geometry,
   LineString,
   MultiLineString,
   Position,
 } from "geojson"
 
-export type iProperties = GeoJsonProperties & {
-  time: string
-}
-
-export type MultiLineStringProperties = iProperties & {
-  coordinateProperties: { times: string[][] }
-}
-
-export type LineStringProperties = iProperties & {
-  coordinateProperties: { times: string[] }
-}
+import { LineStringProperties, MultiLineStringProperties } from "@/types/geo"
 
 export const fromMultiLineToLineString = (
   feature: GeoJSON.Feature<MultiLineString>
@@ -37,14 +28,8 @@ export const fromMultiLineToLineString = (
 }
 
 const flatten = (
-  feature: GeoJSON.Feature<
-    Geometry,
-    LineStringProperties | MultiLineStringProperties
-  >
+  feature: GeoJSON.Feature<MultiLineString, MultiLineStringProperties>
 ): GeoJSON.Feature<LineString, LineStringProperties> | null => {
-  if (feature.geometry.type === "LineString")
-    return feature as GeoJSON.Feature<LineString, LineStringProperties>
-
   if (feature.geometry.type === "MultiLineString") {
     const flatCoordinates = feature.geometry.coordinates.flat()
     const flatTimesProperties =
@@ -66,85 +51,73 @@ const flatten = (
 }
 
 export const concatLineStrings = (
-  prevLineString: GeoJSON.Feature<
-    LineString,
-    LineStringProperties | GeoJsonProperties
-  >,
-  newLineString: GeoJSON.Feature<
-    LineString,
-    LineStringProperties | GeoJsonProperties
-  >
+  prevLineString: GeoJSON.Feature<LineString, LineStringProperties>,
+  newLineString: GeoJSON.Feature<LineString, LineStringProperties>
 ) => {
   const { prev: prevLS, new: newLS } = getConcatOrder(
     prevLineString,
     newLineString
   )
 
-  if (
-    prevLineString.properties?.coordinateProperties.times &&
-    newLineString.properties?.coordinateProperties.times
-  ) {
-    const prevCoords = prevLS.geometry.coordinates
-    const newCoords = newLS.geometry.coordinates
+  const prevCoords = prevLS.geometry.coordinates
+  const newCoords = newLS.geometry.coordinates
 
-    const prevCoordTimes = prevLS.properties?.coordinateProperties
-      .times as string[]
+  const prevCoordTimes = prevLS.properties.coordinateProperties.times
 
-    const newCoordTimes = newLS.properties?.coordinateProperties
-      .times as string[]
+  const newCoordTimes = newLS.properties?.coordinateProperties.times
 
-    const coordinates = prevCoords.concat(newCoords)
-    const times = prevCoordTimes.concat(newCoordTimes)
+  const coordinates = prevCoords.concat(newCoords)
+  const times = prevCoordTimes.concat(newCoordTimes)
 
-    const lineString = {
-      type: "Feature",
-      geometry: {
-        type: "LineString",
-        coordinates,
+  const lineString = {
+    type: "Feature",
+    geometry: {
+      type: "LineString",
+      coordinates,
+    },
+    properties: {
+      ...prevLineString.properties,
+      coordinateProperties: {
+        times,
       },
-      properties: {
-        ...prevLineString.properties,
-        coordinateProperties: {
-          times,
-        },
-      },
-    } as GeoJSON.Feature<LineString, LineStringProperties>
+    },
+  } as GeoJSON.Feature<LineString, LineStringProperties>
 
-    return lineString
-  }
+  return lineString
 }
 
 function getConcatOrder(
-  prevLineString: GeoJSON.Feature<
-    LineString,
-    LineStringProperties | GeoJsonProperties
-  >,
-  newLineString: GeoJSON.Feature<
-    LineString,
-    LineStringProperties | GeoJsonProperties
-  >
+  prevLineString: GeoJSON.Feature<LineString, LineStringProperties>,
+  newLineString: GeoJSON.Feature<LineString, LineStringProperties>
 ) {
-  if (
-    !prevLineString.properties?.coordinateProperties.times ||
-    !newLineString.properties?.coordinateProperties.times
-  ) {
-    return { prev: prevLineString, new: newLineString }
+  let prevDate: Date | null = null
+  let newDate: Date | null = null
+
+  const prevTime = prevLineString.properties.time
+  const newTime = newLineString.properties.time
+
+  if (prevTime && newTime) {
+    prevDate = new Date(prevTime)
+    newDate = new Date(newTime)
+  } else {
+    const prevCoordTimes = prevLineString.properties.coordinateProperties.times
+    const newCoordTimes = newLineString.properties.coordinateProperties.times
+
+    if (prevCoordTimes.length === 0 || newCoordTimes.length === 0) {
+      return { prev: prevLineString, new: newLineString }
+    }
+
+    const prevTimeString = prevCoordTimes.at(-1) //last
+    const newTimeString = newCoordTimes.at(0) //first
+
+    if (!prevTimeString || !newTimeString)
+      return { prev: prevLineString, new: newLineString }
+
+    prevDate = new Date(prevTimeString)
+    newDate = new Date(newTimeString)
   }
 
-  const prevCoordTimes = prevLineString.properties.coordinateProperties
-    .times as string[]
-
-  const newCoordTimes = newLineString.properties.coordinateProperties
-    .times as string[]
-
-  const prevTimeString = prevCoordTimes.at(-1) //last
-  const newTimeString = newCoordTimes.at(0) //first
-
-  if (!prevTimeString || !newTimeString)
-    return { prev: prevLineString, new: newLineString }
-
-  const prevDate = new Date(prevTimeString)
-  const newDate = new Date(newTimeString)
+  if (!prevDate || !newDate) return { prev: prevLineString, new: newLineString }
 
   if (prevDate.getTime() < newDate.getTime()) {
     return { prev: prevLineString, new: newLineString }
@@ -153,43 +126,85 @@ function getConcatOrder(
   }
 }
 
+function addProperties(
+  feature: Feature<LineString | MultiLineString, GeoJsonProperties>
+): Feature<
+  LineString | MultiLineString,
+  LineStringProperties | MultiLineStringProperties
+> {
+  return {
+    type: feature.type,
+    geometry: feature.geometry,
+    properties: {
+      ...feature.properties,
+      time: feature.properties?.time || "",
+      coordinateProperties: {
+        times: feature.properties?.coordinateProperties.times || [],
+      },
+    },
+  }
+}
+
 export const gpxToLineString = (
   result: string
 ): GeoJSON.Feature<LineString, LineStringProperties> | null => {
-  const fc: FeatureCollection<Geometry, GeoJsonProperties> = gpx(
-    new DOMParser().parseFromString(result, "text/xml")
-  )
+  const gpxData = new DOMParser().parseFromString(result, "text/xml")
+  const featureCollection = gpx(gpxData)
 
-  const numberOfFeatures = fc.features.length
+  const numberOfFeatures = featureCollection.features.length
 
   if (numberOfFeatures < 1) {
     return null
   }
 
-  let time = ""
+  let time: string | null = null
   let coordinates: Position[] = []
   let times: string[] = []
 
+  const allowedFeatures = ["LineString", "MultiLineString"]
+
   // Combine all Features from one FC to one LineString
   for (let j = 0; j < numberOfFeatures; j++) {
-    const feature = flatten(
-      fc.features[j] as GeoJSON.Feature<
-        Geometry,
-        LineStringProperties | MultiLineStringProperties
+    const feature = featureCollection.features[j]
+    const featureType = feature.geometry.type
+
+    if (!allowedFeatures.includes(featureType)) continue
+
+    const featureWithProperties = addProperties(
+      feature as GeoJSON.Feature<
+        LineString | MultiLineString,
+        MultiLineStringProperties
       >
     )
 
-    if (!feature) continue
+    let lineStringFeature: GeoJSON.Feature<
+      LineString,
+      LineStringProperties
+    > | null = null
 
-    const coords = feature.geometry.coordinates
+    if (feature.geometry.type === "MultiLineString") {
+      lineStringFeature = flatten(
+        featureWithProperties as GeoJSON.Feature<
+          MultiLineString,
+          MultiLineStringProperties
+        >
+      )
+    } else {
+      lineStringFeature = featureWithProperties as GeoJSON.Feature<
+        LineString,
+        LineStringProperties
+      >
+    }
+
+    if (!lineStringFeature) continue
+
+    const coords = lineStringFeature.geometry.coordinates
     coordinates = coordinates.concat(coords)
 
-    const coordTimes = feature.properties.coordinateProperties.times
+    const coordTimes = lineStringFeature.properties.coordinateProperties.times
     times = times.concat(coordTimes)
 
-    if (time === "") {
-      time = feature.properties.time
-    }
+    time = lineStringFeature.properties.time || new Date().toISOString()
   }
 
   const lineString = {
@@ -206,22 +221,13 @@ export const gpxToLineString = (
     },
   } as GeoJSON.Feature<LineString, LineStringProperties>
 
-  const trunc = truncate(lineString)
-  const simplied = simplify(trunc)
+  // const trunc = truncate(lineString)
+  // const simplied = simplify(trunc)
 
   return lineString
 }
 
-export const asyncGpxToLineString = (input: string) => {
-  return new Promise((resolve, reject) => {
-    const result = gpxToLineString(input)
-    resolve(result)
-  })
-}
-
-export function toSingleLineString(
-  featureCollection: GeoJSON.FeatureCollection
-) {
+function toSingleLineString(featureCollection: GeoJSON.FeatureCollection) {
   const coordinates: Position[] = featureCollection.features.reduce(
     (acc, feature) => {
       const geometry = feature.geometry
@@ -239,25 +245,4 @@ export function toSingleLineString(
     coordinates,
   }
   return lineString
-}
-
-export function getDateFromFeature(feature: GeoJSON.Feature) {
-  if (feature.properties && feature.properties.time) {
-    const time = feature.properties.properties.time
-    return new Date(time.slice(0, 10))
-  }
-  return null
-}
-
-export function makeFeature(
-  lineString: GeoJSON.LineString,
-  properties?: GeoJSON.GeoJsonProperties,
-  id?: string
-): GeoJSON.Feature<GeoJSON.LineString, GeoJSON.GeoJsonProperties> {
-  return {
-    type: "Feature",
-    properties: properties || {},
-    geometry: lineString,
-    id: id || "",
-  }
 }

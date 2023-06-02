@@ -1,7 +1,5 @@
 import { Track } from "@prisma/client"
 
-import { LineStringProperties } from "@/lib/geoHelpers"
-
 export type FileData = {
   filename: string
   date: Date
@@ -25,6 +23,16 @@ export type TrackWithTrack = {
 } & Track
 
 export type TrackWithoutProperties = Omit<Track, "properties">
+
+export type MultiLineStringProperties = GeoJSON.GeoJsonProperties & {
+  time: string
+  coordinateProperties: { times: string[][] }
+}
+
+export type LineStringProperties = GeoJSON.GeoJsonProperties & {
+  time: string
+  coordinateProperties: { times: string[] }
+}
 
 // types for ts-to-zod
 

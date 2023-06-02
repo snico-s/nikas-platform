@@ -2,6 +2,7 @@
 
 import { Dispatch, SetStateAction, useState } from "react"
 import length from "@turf/length"
+import cuid from "cuid"
 
 import { concatLineStrings, gpxToLineString } from "@/lib/geoHelpers"
 import { sameDate } from "@/lib/utils"
@@ -87,6 +88,7 @@ export default function GPXInput({
         return [
           ...prev,
           {
+            id: cuid(),
             date,
             track: lineString,
             distance: distance,

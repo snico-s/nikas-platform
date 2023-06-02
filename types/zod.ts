@@ -25,10 +25,19 @@ export const lineStringSchema = geoJsonObjectSchema.extend({
   coordinates: z.array(positionSchema),
 })
 
+export const lineStringPropertiesSchema = z.record(z.any()).and(
+  z.object({
+    time: z.string(),
+    coordinateProperties: z.object({
+      times: z.array(z.string()),
+    }),
+  })
+)
+
 export const featureWithLineStringSchema = z.object({
   type: z.literal("Feature"),
   id: z.any().optional(),
-  properties: z.record(z.any()),
+  properties: lineStringPropertiesSchema,
   geometry: lineStringSchema,
 })
 
@@ -36,4 +45,5 @@ export const trackCreateSchema = z.object({
   track: featureWithLineStringSchema,
   distance: z.number(),
   date: z.date(),
+  id: z.string().optional(),
 })
