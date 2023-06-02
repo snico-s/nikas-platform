@@ -45,5 +45,5 @@ export const trackCreateSchema = z.object({
   track: featureWithLineStringSchema,
   distance: z.number(),
   date: z.date(),
-  id: z.string().optional(),
+  id: z.string(),
 })

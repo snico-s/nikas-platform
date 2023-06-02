@@ -112,6 +112,7 @@ export function AddTrack() {
                     <TravelDayListItem
                       key={index}
                       travelDayData={travelDayData}
+                      setTravelDayDataList={setTravelDayDataList}
                     />
                   ))}
               </ol>

@@ -16,6 +16,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { CreateTrack } from "@/components/add-track"
 import {
   Form,
   FormControl,
@@ -25,15 +26,18 @@ import {
   FormMessage,
 } from "@/components/form"
 import { Icons } from "@/components/icons"
-import { CreateTrack } from "@/app/track/add/page"
 
 type TravelDayListItemProps = {
   travelDayData: CreateTrack
+  setTravelDayDataList: Dispatch<SetStateAction<CreateTrack[]>>
 }
 
 const FormSchema = trackCreateSchema
 
-function TravelDayListItem({ travelDayData }: TravelDayListItemProps) {
+function TravelDayListItem({
+  travelDayData,
+  setTravelDayDataList,
+}: TravelDayListItemProps) {
   const [edit, setEdit] = useState(false)
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -105,9 +109,20 @@ function TravelDayListItem({ travelDayData }: TravelDayListItemProps) {
                               const userTimezoneOffset =
                                 event.getTimezoneOffset() * 60000
 
-                              field.onChange(
-                                new Date(event.getTime() - userTimezoneOffset)
+                              const newDate = new Date(
+                                event.getTime() - userTimezoneOffset
                               )
+
+                              field.onChange(newDate)
+
+                              setTravelDayDataList((prev) => {
+                                const newArray = prev.map((item) => {
+                                  if (item.id !== travelDayData.id) return item
+                                  return { ...item, date: newDate }
+                                })
+
+                                return newArray
+                              })
                             }}
                             disabled={(date) =>
                               date > new Date() || date < new Date("1900-01-01")
@@ -153,6 +168,14 @@ function TravelDayListItem({ travelDayData }: TravelDayListItemProps) {
                             )
                             const rounded = Math.round(newDistance * 100) / 100
                             field.onChange(rounded)
+
+                            setTravelDayDataList((prev) => {
+                              const newArray = prev.map((item) => {
+                                if (item.id !== travelDayData.id) return item
+                                return { ...item, distance: rounded }
+                              })
+                              return newArray
+                            })
                           }}
                         />
                       </FormControl>
