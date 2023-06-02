@@ -1,12 +1,9 @@
 import { gpx } from "@tmcw/togeojson"
-import simplify from "@turf/simplify"
-import truncate from "@turf/truncate"
+// import simplify from "@turf/simplify"
+// import truncate from "@turf/truncate"
 import {
   Feature,
-  FeatureCollection,
   GeoJsonProperties,
-  GeoJsonTypes,
-  Geometry,
   LineString,
   MultiLineString,
   Position,

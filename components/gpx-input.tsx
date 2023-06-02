@@ -9,7 +9,8 @@ import { sameDate } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
-import { CreateTrack } from "@/app/track/add/page"
+
+import { CreateTrack } from "./add-track"
 
 type Props = {
   setUnsuccessful: Dispatch<SetStateAction<string[]>>
