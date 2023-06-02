@@ -3,16 +3,16 @@
 import { Dispatch, SetStateAction, useState } from "react"
 import length from "@turf/length"
 
-import { FileData, TravelDayData } from "@/types/geo"
 import { concatLineStrings, gpxToLineString } from "@/lib/geoHelpers"
 import { sameDate } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
+import { CreateTrack } from "@/app/track/add/page"
 
 type Props = {
   setUnsuccessful: Dispatch<SetStateAction<string[]>>
-  setTravelDayDataList: Dispatch<SetStateAction<TravelDayData[]>>
+  setTravelDayDataList: Dispatch<SetStateAction<CreateTrack[]>>
   setFileReadCompleted: Dispatch<SetStateAction<boolean>>
 }
 
@@ -76,12 +76,6 @@ export default function GPXInput({
     const date = new Date(time.slice(0, 10))
     const distance = Math.round(length(lineString) * 100) / 100
 
-    const routeFileData: FileData = {
-      filename: file.name,
-      date,
-      lineString,
-    }
-
     setTravelDayDataList((prev) => {
       const dateExists =
         prev.findIndex((item) => {
@@ -94,23 +88,26 @@ export default function GPXInput({
           ...prev,
           {
             date,
-            lineString,
-            fileData: [routeFileData],
+            track: lineString,
             distance: distance,
           },
         ]
       }
 
-      const next: TravelDayData[] = prev.map((item) => {
+      const next: CreateTrack[] = prev.map((item) => {
         if (!sameDate(item.date, date)) return item
 
         const newDistance = item.distance + distance
-        const newLineString = concatLineStrings(item.lineString, lineString)
+        const newLineString = concatLineStrings(item.track, lineString)
+        if (!newLineString) {
+          return { ...item }
+          setUnsuccessful((prev) => [...prev, file.name])
+        }
+
         return {
           ...item,
-          lineString: newLineString,
+          track: newLineString,
           distance: newDistance,
-          fileData: [...item.fileData, routeFileData],
         }
       })
 

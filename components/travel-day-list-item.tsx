@@ -6,7 +6,6 @@ import { format } from "date-fns"
 import { SubmitHandler, useForm } from "react-hook-form"
 import * as z from "zod"
 
-import { TravelDayData } from "@/types/geo"
 import { trackCreateSchema } from "@/types/zod"
 import { cn, sameDate } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -26,31 +25,23 @@ import {
   FormMessage,
 } from "@/components/form"
 import { Icons } from "@/components/icons"
+import { CreateTrack } from "@/app/track/add/page"
 
 type TravelDayListItemProps = {
-  travelDayData: TravelDayData
-  handleDelete: (travelDayData: TravelDayData) => void
-  setTravelDayDataList: Dispatch<SetStateAction<TravelDayData[]>>
-  upload: boolean
+  travelDayData: CreateTrack
 }
 
 const FormSchema = trackCreateSchema
 
-function TravelDayListItem({
-  travelDayData,
-  handleDelete,
-  upload,
-  setTravelDayDataList,
-}: TravelDayListItemProps) {
+function TravelDayListItem({ travelDayData }: TravelDayListItemProps) {
   const [edit, setEdit] = useState(false)
-  const [error, setError] = useState(false)
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       date: travelDayData.date,
       distance: travelDayData.distance,
-      track: travelDayData.lineString,
+      track: travelDayData.track,
     },
   })
 
@@ -63,41 +54,12 @@ function TravelDayListItem({
     setEdit(false)
   }
 
-  useEffect(() => {
-    console.log("useEffect Upload")
-    const onSubmit: SubmitHandler<z.infer<typeof trackCreateSchema>> = async (
-      formData
-    ) => {
-      try {
-        const response = await fetch("/api/tracks", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        })
-        if (response.ok) {
-          setTravelDayDataList((prev) =>
-            prev.filter((item) => sameDate(item.date, travelDayData.date))
-          )
-        }
-      } catch (error) {
-        setError(true)
-        console.error(error)
-      }
-
-      setEdit(false)
-    }
-    if (upload) form.handleSubmit(onSubmit)()
-  }, [upload, form, setTravelDayDataList, travelDayData.date])
-
   return (
     <li>
       {edit ? (
         <div className="m-2 rounded-lg border p-2 shadow-sm">
           <div
             className={cn(
-              error && "my-1 border border-destructive",
               "flex place-content-between items-center rounded-xl p-2 hover:bg-accent hover:text-accent-foreground"
             )}
           ></div>
@@ -227,7 +189,6 @@ function TravelDayListItem({
       ) : (
         <div
           className={cn(
-            error && "my-1 border border-destructive",
             "flex place-content-between items-center rounded-xl p-2 hover:bg-accent hover:text-accent-foreground"
           )}
         >
@@ -269,14 +230,6 @@ function TravelDayListItem({
             >
               <Icons.pencil width={16} height={16} />
               <span className="sr-only">Edit</span>
-            </Button>
-            <Button
-              className="px-2"
-              variant={"ghost"}
-              onClick={() => handleDelete(travelDayData)}
-            >
-              <Icons.trash2 width={16} height={16} />
-              <span className="sr-only">Delete</span>
             </Button>
           </div>
         </div>

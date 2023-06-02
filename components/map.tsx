@@ -2,12 +2,12 @@ import { useEffect, useRef } from "react"
 import maplibregl, { LngLatBounds } from "maplibre-gl"
 
 import "node_modules/maplibre-gl/dist/maplibre-gl.css"
-import { LineStringProperties } from "@/lib/geoHelpers"
 import { cn, generateRandomString } from "@/lib/utils"
 
 type Props = {
-  lineStrings?: GeoJSON.Feature<GeoJSON.LineString, LineStringProperties>[]
+  lineStrings?: GeoJSON.Feature<GeoJSON.LineString, GeoJSON.GeoJsonProperties>[]
   removedLayerIds?: string[]
+  fileReadCompleted: boolean
 } & React.HTMLAttributes<HTMLDivElement>
 
 const API_KEY = process.env.NEXT_PUBLIC_MAPTILER_API_KEY
@@ -16,6 +16,7 @@ export default function Map({
   lineStrings,
   removedLayerIds,
   className,
+  fileReadCompleted,
   ...props
 }: Props) {
   const mapContainer = useRef<HTMLDivElement | null>(null)
@@ -33,7 +34,7 @@ export default function Map({
 
   useEffect(() => {
     if (!map.current || !map.current.loaded) return
-    if (!map.current || !lineStrings || lineStrings.length === 0) return
+    if (!lineStrings || lineStrings.length === 0) return
     const bounds = new LngLatBounds()
 
     for (const lineString of lineStrings) {
@@ -45,7 +46,7 @@ export default function Map({
     }
 
     map.current.fitBounds(bounds, { padding: 20 })
-  }, [lineStrings])
+  }, [lineStrings, fileReadCompleted])
 
   function addGeoJsonToMap(geoJson: GeoJSON.Feature, map: maplibregl.Map) {
     const id = geoJson.id?.toString() || generateRandomString()

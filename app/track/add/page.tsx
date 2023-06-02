@@ -1,36 +1,41 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { redirect, useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
+import { z } from "zod"
 
-import { TravelDayData } from "@/types/geo"
-import { LineStringProperties } from "@/lib/geoHelpers"
+import { trackCreateSchema } from "@/types/zod"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { ToastAction } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
 import GPXInput from "@/components/gpx-input"
 import { Icons } from "@/components/icons"
 import Map from "@/components/map"
 import TravelDayListItem from "@/components/travel-day-list-item"
 
+export type CreateTrack = z.infer<typeof trackCreateSchema>
+
+async function postTrack(data: CreateTrack) {
+  const response = await fetch("/api/tracks", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+  return response
+}
+
 export default function AddTrackPage() {
   const [unsuccessful, setUnsuccessful] = useState<string[]>([])
-  const [travelDayDataList, setTravelDayDataList] = useState<TravelDayData[]>(
-    []
-  )
+  const [travelDayDataList, setTravelDayDataList] = useState<CreateTrack[]>([])
   const [fileReadCompleted, setFileReadCompleted] = useState(false)
-  const [removedLayerIds, setRemovedLayerIds] = useState<string[]>([])
   const [upload, setUpload] = useState(false)
 
   const [uploading, setUploading] = useState(false)
 
   const router = useRouter()
-
-  useEffect(() => {
-    if (upload && travelDayDataList.length === 0) router.push("/user/tracks/")
-  }, [travelDayDataList, upload, router])
 
   const { data: session } = useSession()
 
@@ -39,34 +44,30 @@ export default function AddTrackPage() {
   if (!session) {
     redirect("/signin")
   }
-  const handleDelete = (travelDayData: TravelDayData) => {
-    const id = travelDayData.date.toString()
 
-    toast({
-      title: "Delete Item from List",
-      description: `Deleted: ${travelDayData.date.toDateString()}`,
-      action: (
-        <ToastAction altText="Undo" onClick={() => handleUndo(id)}>
-          Undo
-        </ToastAction>
-      ),
-      variant: "destructive",
-    })
-
-    setRemovedLayerIds([...removedLayerIds, id])
-  }
-
-  const handleUndo = (id: string) => {
-    setRemovedLayerIds(removedLayerIds.filter((item) => item !== id))
-  }
-
-  const filterDeleted = (travelDayData: TravelDayData) => {
-    const id = travelDayData.date.toString()
-    return !removedLayerIds.includes(id)
-  }
-
-  const handleSort = (a: TravelDayData, b: TravelDayData) => {
+  const handleSort = (a: CreateTrack, b: CreateTrack) => {
     return a.date.getTime() - b.date.getTime()
+  }
+
+  async function handleUpload() {
+    const responseList = await Promise.all(
+      travelDayDataList.map(async (data) => {
+        const response = await postTrack(data)
+        return response
+      })
+    )
+
+    responseList.forEach((response) => {
+      if (!response.ok) {
+        return toast({
+          title: "Something went wrong.",
+          description: "Please refresh the page and try again.",
+          variant: "destructive",
+        })
+      }
+    })
+    router.refresh()
+    router.push("/user/tracks")
   }
 
   return (
@@ -74,20 +75,23 @@ export default function AddTrackPage() {
       <div className="md:flex">
         <Map
           className="h-[calc(100vh-24rem-4rem-1px)] md:h-[calc(100vh-4rem-1px)] md:w-2/3"
-          lineStrings={travelDayDataList.map((travelDayData) => {
-            const lineString: GeoJSON.Feature<
-              GeoJSON.LineString,
-              LineStringProperties
-            > = {
-              geometry: travelDayData.lineString.geometry,
-              properties: travelDayData.lineString.properties,
-              type: "Feature",
-              id: travelDayData.date.toString(),
-              bbox: travelDayData.lineString?.bbox,
-            }
-            return lineString
-          })}
-          removedLayerIds={removedLayerIds}
+          lineStrings={
+            fileReadCompleted
+              ? travelDayDataList.map((travelDayData) => {
+                  const lineString: GeoJSON.Feature<
+                    GeoJSON.LineString,
+                    GeoJSON.GeoJsonProperties
+                  > = {
+                    geometry: travelDayData.track.geometry,
+                    properties: travelDayData.track.properties,
+                    type: "Feature",
+                    id: travelDayData.date.toString(),
+                  }
+                  return lineString
+                })
+              : []
+          }
+          fileReadCompleted={fileReadCompleted}
         />
         {fileReadCompleted ? (
           <div className="h-96 md:h-[calc(100vh-4rem-3.5rem-1px)] md:w-1/3">
@@ -97,9 +101,7 @@ export default function AddTrackPage() {
                 disabled={uploading}
                 onClick={() => {
                   setUploading(true)
-                  setTimeout(() => {
-                    setUpload(true)
-                  }, 500)
+                  handleUpload()
                 }}
               >
                 {uploading ? (
@@ -114,15 +116,12 @@ export default function AddTrackPage() {
             <ScrollArea className="h-full w-full">
               <ol className="m-2">
                 {travelDayDataList
-                  .filter(filterDeleted)
+                  // .filter(filterDeleted)
                   .sort(handleSort)
                   .map((travelDayData, index) => (
                     <TravelDayListItem
                       key={index}
                       travelDayData={travelDayData}
-                      handleDelete={handleDelete}
-                      setTravelDayDataList={setTravelDayDataList}
-                      upload={upload}
                     />
                   ))}
               </ol>
